@@ -1,0 +1,11 @@
+*.exe
+*.test
+*.out
+vendor/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+config.json

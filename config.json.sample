@@ -1,0 +1,28 @@
+{
+    "listen_address": "0.0.0.0:8080",
+    "auth": {
+        "username": "",
+        "password": "",
+        "realm": ""
+    },
+    "mounts": [
+        {
+            "name": "mount_name",
+            "host": "host",
+            "port": 21,
+            "username": "some_user",
+            "password": "some_password",
+            "root_path": "/",
+            "tls_mode": "",
+            "passive_mode": false,
+            "connect_timeout": 15
+        }
+    ],
+    "timeouts": {
+        "connect_seconds": 15,
+        "read_seconds": 15
+    },
+    "logging": {
+        "level": "debug"
+    }
+}

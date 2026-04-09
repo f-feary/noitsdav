@@ -2,6 +2,7 @@ package ftpfs
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -47,3 +48,11 @@ func parseFactsLine(line string) (Entry, error) {
 	return entry, nil
 }
 
+func sortEntries(entries []Entry) {
+	sort.Slice(entries, func(i, j int) bool {
+		if entries[i].Name == entries[j].Name {
+			return entries[i].Path < entries[j].Path
+		}
+		return entries[i].Name < entries[j].Name
+	})
+}

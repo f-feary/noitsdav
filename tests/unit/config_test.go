@@ -32,6 +32,9 @@ func TestLoadConfigDefaultsAndValidation(t *testing.T) {
 	if cfg.Mounts[0].Port != 21 {
 		t.Fatalf("expected default port 21, got %d", cfg.Mounts[0].Port)
 	}
+	if cfg.Mounts[0].ConnectionPool != 0 {
+		t.Fatalf("expected default connection pool size 0, got %d", cfg.Mounts[0].ConnectionPool)
+	}
 }
 
 func TestValidateRejectsDuplicateMounts(t *testing.T) {
@@ -50,3 +53,17 @@ func TestValidateRejectsDuplicateMounts(t *testing.T) {
 	}
 }
 
+func TestValidateRejectsNegativeConnectionPoolSize(t *testing.T) {
+	t.Parallel()
+
+	cfg := &config.Config{
+		ListenAddress: ":8080",
+		Auth:          config.AuthConfig{Username: "dav", Password: "pass"},
+		Mounts: []config.MountConfig{
+			{Name: "media", Host: "a", Username: "u", Password: "p", RootPath: "/", ConnectionPool: -1},
+		},
+	}
+	if err := cfg.Validate(); err == nil {
+		t.Fatal("expected negative connection pool validation error")
+	}
+}

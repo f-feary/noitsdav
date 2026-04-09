@@ -15,7 +15,8 @@
             "root_path": "/",
             "tls_mode": "",
             "passive_mode": false,
-            "connect_timeout": 15
+            "connect_timeout": 15,
+            "connection_pool_size": 2
         }
     ],
     "timeouts": {

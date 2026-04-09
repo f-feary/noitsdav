@@ -20,11 +20,12 @@ import (
 
 type Handler struct {
 	registry *mounts.Registry
+	clients  map[string]*ftpfs.Client
 	logger   *slog.Logger
 }
 
-func NewHandler(registry *mounts.Registry, logger *slog.Logger) http.Handler {
-	return &Handler{registry: registry, logger: logger}
+func NewHandler(registry *mounts.Registry, clients map[string]*ftpfs.Client, logger *slog.Logger) http.Handler {
+	return &Handler{registry: registry, clients: clients, logger: logger}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +77,11 @@ func (h *Handler) handlePropfind(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
-		client := ftpfs.NewClient(mount)
+		client, ok := h.clients[mount.Name]
+		if !ok {
+			http.Error(w, fmt.Sprintf("mount %s unavailable", mount.Name), http.StatusServiceUnavailable)
+			return
+		}
 		entry, err := client.Stat(r.Context(), resolved.BackendPath)
 		if err != nil {
 			h.updateHealth(mount.Name, err)
@@ -92,7 +97,7 @@ func (h *Handler) handlePropfind(w http.ResponseWriter, r *http.Request) {
 			responses = append(responses, responseForPath(absoluteHref(r, currentHref), entry))
 		}
 		if entry.IsDir && depth != "0" {
-			children, err := client.ListDir(r.Context(), resolved.BackendPath)
+			children, err := client.ListKnownDir(r.Context(), resolved.BackendPath)
 			if err != nil {
 				h.updateHealth(mount.Name, err)
 				h.writeBackendError(w, mount.Name, err)
@@ -130,7 +135,11 @@ func (h *Handler) handleRead(w http.ResponseWriter, r *http.Request, headOnly bo
 		http.NotFound(w, r)
 		return
 	}
-	client := ftpfs.NewClient(mount)
+	client, ok := h.clients[mount.Name]
+	if !ok {
+		http.Error(w, fmt.Sprintf("mount %s unavailable", mount.Name), http.StatusServiceUnavailable)
+		return
+	}
 	result, err := ftpfs.ReadFile(r.Context(), client, resolved.BackendPath, 0)
 	if err != nil {
 		h.updateHealth(mount.Name, err)

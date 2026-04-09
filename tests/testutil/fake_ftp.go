@@ -26,6 +26,7 @@ type FakeFTPServer struct {
 	user     string
 	pass     string
 	root     map[string]Node
+	accepted int
 	mu       sync.RWMutex
 }
 
@@ -45,12 +46,21 @@ func (s *FakeFTPServer) Addr() string { return s.addr }
 
 func (s *FakeFTPServer) Close() error { return s.listener.Close() }
 
+func (s *FakeFTPServer) TotalConnections() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.accepted
+}
+
 func (s *FakeFTPServer) serve() {
 	for {
 		conn, err := s.listener.Accept()
 		if err != nil {
 			return
 		}
+		s.mu.Lock()
+		s.accepted++
+		s.mu.Unlock()
 		go s.handleConn(conn)
 	}
 }
@@ -266,4 +276,3 @@ func ReadAll(rc io.ReadCloser) []byte {
 	}
 	return data
 }
-

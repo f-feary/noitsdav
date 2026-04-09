@@ -14,6 +14,9 @@ Then, run it:
 
 `go run ./cmd/noitsdav --config myconfig.json`
 
+Each mount can optionally set `connection_pool_size` to keep FTP control connections
+warm on a per-mount basis. Set it to `0` to disable pooling for that mount.
+
 
 ## Supported operations
 

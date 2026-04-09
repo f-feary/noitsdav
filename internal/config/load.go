@@ -59,6 +59,9 @@ func (c *Config) Validate() error {
 		if m.Port == 0 {
 			m.Port = 21
 		}
+		if m.ConnectionPool < 0 {
+			return fmt.Errorf("mount %q has invalid connection_pool_size %d", m.Name, m.ConnectionPool)
+		}
 		if m.RootPath == "" {
 			m.RootPath = "/"
 		}
@@ -67,4 +70,3 @@ func (c *Config) Validate() error {
 
 	return nil
 }
-

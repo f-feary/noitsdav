@@ -24,6 +24,7 @@ type MountConfig struct {
 	TLSMode        string `json:"tls_mode"`
 	PassiveMode    *bool  `json:"passive_mode"`
 	ConnectTimeout int    `json:"connect_timeout"`
+	ConnectionPool int    `json:"connection_pool_size"`
 }
 
 type Timeouts struct {
@@ -34,4 +35,3 @@ type Timeouts struct {
 type Logging struct {
 	Level string `json:"level"`
 }
-
